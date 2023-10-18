@@ -1,0 +1,20 @@
+{
+  "name": "book-recommendation-system-using-collaborative-filtering",
+  "version": "1.0.0",
+  "description": "This is a book recommendation system that employs collaborative filtering to suggest books based on user interactions and ratings. It helps users discover books enjoyed by them with similar preferences. Valuable for online bookstores, libraries, or any platform aiming to offer personalized book recommendations.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
