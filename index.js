@@ -1,7 +1,10 @@
-import express from "express";
+import app from "./app.js"
+import { config } from 'dotenv';
+import connectionToDB from './config/dbConnection.js';
 
-const app = express();
-
-app.listen(5000, () => {
-    console.log("I am running.")
+config();
+const PORT = process.env.PORT || 5463
+app.listen(PORT, async () => {
+    await connectionToDB()
+    console.log(`Book Recommendation Server running at port ${PORT}`)
 })
