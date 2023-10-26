@@ -3,6 +3,7 @@ import cors from 'cors';
 import morgan from "morgan";
 import cookieParser from 'cookie-parser';
 import { config } from 'dotenv';
+import bookRoutes from "./router/book.route.js"
 
 config();
 const app = express();
@@ -23,5 +24,12 @@ app.use("/ping", function (req, res, next) {
     res.send("Pong");
     next();
 })
+
+app.use("/api/v1/book",bookRoutes);
+
+
+
+
+
 
 export default app;
