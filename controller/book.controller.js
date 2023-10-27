@@ -60,9 +60,21 @@ const dailyTop100 = async (req, res) => {
     }
 }
 
+const bookData = async (req, res) => {
+    try {
+        const id = req.params['id'];
+        const bookDetails = await Book.findById(id)
+        res.status(200).json(bookDetails);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
 export {
     newReleases,
-    dailyTop100
+    dailyTop100,
+    bookData
 }
 
 
