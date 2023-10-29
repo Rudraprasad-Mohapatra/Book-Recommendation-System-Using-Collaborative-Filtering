@@ -1,4 +1,5 @@
 import Book from "../model/book.model.js"
+import Rating from "../model/rating.model.js"
 
 const newReleases = async (req, res) => {
     const PAGE_SIZE = 10;
@@ -71,10 +72,125 @@ const bookData = async (req, res) => {
     }
 }
 
+// Example endpoint for Best Sellers
+// const bestSellers = async (req, res) => {
+//     const PAGE_SIZE = 10;
+//     try {
+//         const page = parseInt(req.query.page) || 1;
+
+//         const booksPerPage = PAGE_SIZE;
+//         const skip = (page - 1) * booksPerPage;
+
+//         // Fetch a subset of books
+//         const booksSubset = await Book.find({})
+//             .skip(skip)
+//             .limit(booksPerPage);
+
+//         // Calculate the average rating for each book in the subset
+//         const booksWithRatings = await Promise.all(booksSubset.map(async (book) => {
+//             const ratings = await Rating.find({ ISBN: book.ISBN });
+//             let sum = 0;
+//             let count = 0;
+//             ratings.forEach((rating) => {
+//                 const ratingValue = rating['Book-Rating'];
+//                 if (ratingValue !== 0) {
+//                     sum += ratingValue;
+//                     count++;
+//                 }
+//             });
+
+//             const averageRating = count > 0 ? sum / count : 0;
+//             console.log(sum);
+
+//             return {
+//                 book,
+//                 averageRating,
+//             };
+//         }));
+
+//         // Sort the books by average rating in descending order
+//         const sortedBooks = booksWithRatings.sort((a, b) => b.averageRating - a.averageRating);
+
+//         res.json(sortedBooks);
+//     } catch (error) {
+//         res.status(500).json({ error: error.message });
+//     }
+// }
+
+const bestSellers = async (req, res) => {
+    const PAGE_SIZE = 10;
+    try {
+        const page = parseInt(req.query.page) || 1;
+
+        const booksPerPage = PAGE_SIZE;
+        const skip = (page - 1) * booksPerPage;
+
+        // Fetch a subset of books
+        const booksSubset = await Book.find({})
+            .skip(skip)
+            .limit(booksPerPage);
+
+        // Calculate the average rating for each book in the subset
+        const booksWithRatings = await Promise.all(booksSubset.map(async (book) => {
+            try {
+                const ratings = await Rating.find({ ISBN: book.ISBN });
+                let sum = 0;
+                let count = 0;
+                // console.log(ratings.length);
+                ratings.forEach((rating) => {
+                    console.log(rating);
+                    // const ratingValue = Number(rating['Book-Rating']);
+                    if (typeof rating['Book-Rating'] === 'number') {
+                        const ratingValue = Number(rating['Book-Rating']);
+                        console.log(ratingValue); // 10
+                    if (ratingValue !== 0) {
+                        sum += ratingValue;
+                        count++;
+                    }
+                    } else {
+                        console.log('The Book-Rating field is not a number.');
+                    }
+                    // console.log(ratingValue);
+                    // if (ratingValue !== 0) {
+                    //     sum += ratingValue;
+                    //     count++;
+                    // }
+                });
+
+                const averageRating = count > 0 ? sum / count : 0;
+                // console.log(sum);
+
+                return {
+                    book,
+                    averageRating,
+                };
+            } catch (error) {
+                // Handle any errors that may occur when querying ratings for a book
+                console.error(`Error calculating ratings for book with ISBN: ${book.ISBN}`);
+                console.error(error);
+                return {
+                    book,
+                    averageRating: 0, // Handle the error by setting the averageRating to 0
+                };
+            }
+        }));
+
+        // Sort the books by average rating in descending order
+        const sortedBooks = booksWithRatings.sort((a, b) => b.averageRating - a.averageRating);
+
+        res.json(sortedBooks);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
+
 export {
     newReleases,
     dailyTop100,
-    bookData
+    bookData,
+    bestSellers
 }
 
 
