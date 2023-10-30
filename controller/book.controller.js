@@ -72,51 +72,6 @@ const bookData = async (req, res) => {
     }
 }
 
-// Example endpoint for Best Sellers
-// const bestSellers = async (req, res) => {
-//     const PAGE_SIZE = 10;
-//     try {
-//         const page = parseInt(req.query.page) || 1;
-
-//         const booksPerPage = PAGE_SIZE;
-//         const skip = (page - 1) * booksPerPage;
-
-//         // Fetch a subset of books
-//         const booksSubset = await Book.find({})
-//             .skip(skip)
-//             .limit(booksPerPage);
-
-//         // Calculate the average rating for each book in the subset
-//         const booksWithRatings = await Promise.all(booksSubset.map(async (book) => {
-//             const ratings = await Rating.find({ ISBN: book.ISBN });
-//             let sum = 0;
-//             let count = 0;
-//             ratings.forEach((rating) => {
-//                 const ratingValue = rating['Book-Rating'];
-//                 if (ratingValue !== 0) {
-//                     sum += ratingValue;
-//                     count++;
-//                 }
-//             });
-
-//             const averageRating = count > 0 ? sum / count : 0;
-//             console.log(sum);
-
-//             return {
-//                 book,
-//                 averageRating,
-//             };
-//         }));
-
-//         // Sort the books by average rating in descending order
-//         const sortedBooks = booksWithRatings.sort((a, b) => b.averageRating - a.averageRating);
-
-//         res.json(sortedBooks);
-//     } catch (error) {
-//         res.status(500).json({ error: error.message });
-//     }
-// }
-
 const bestSellers = async (req, res) => {
     const PAGE_SIZE = 10;
     try {
@@ -150,7 +105,7 @@ const bestSellers = async (req, res) => {
                 });
 
 
-                const averageRating = count > 0 ? sum / count : 0;
+                let averageRating = count > 0 ? sum / count : 0;
                 averageRating = averageRating.toFixed(1);
                 return {
                     book,
