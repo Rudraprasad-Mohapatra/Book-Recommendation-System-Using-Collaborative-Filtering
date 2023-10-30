@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 // Define a schema for the rating data
 const ratingSchema = new mongoose.Schema({
-    userID: {
+    userId: {
         type: Number,
         required: true
     },

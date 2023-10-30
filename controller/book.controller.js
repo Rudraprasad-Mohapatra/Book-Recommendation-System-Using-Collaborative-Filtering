@@ -136,30 +136,22 @@ const bestSellers = async (req, res) => {
                 const ratings = await Rating.find({ ISBN: book.ISBN });
                 let sum = 0;
                 let count = 0;
-                // console.log(ratings.length);
                 ratings.forEach((rating) => {
-                    console.log(rating);
-                    // const ratingValue = Number(rating['Book-Rating']);
-                    if (typeof rating['Book-Rating'] === 'number') {
-                        const ratingValue = Number(rating['Book-Rating']);
-                        console.log(ratingValue); // 10
-                    if (ratingValue !== 0) {
-                        sum += ratingValue;
-                        count++;
-                    }
+                    const ratingValue = rating.bookRating;
+                    if (typeof rating.bookRating === "number") {
+                        const ratingValue = (rating.bookRating);
+                        if (ratingValue !== 0) {
+                            sum += ratingValue;
+                            count++;
+                        }
                     } else {
                         console.log('The Book-Rating field is not a number.');
                     }
-                    // console.log(ratingValue);
-                    // if (ratingValue !== 0) {
-                    //     sum += ratingValue;
-                    //     count++;
-                    // }
                 });
 
-                const averageRating = count > 0 ? sum / count : 0;
-                // console.log(sum);
 
+                const averageRating = count > 0 ? sum / count : 0;
+                averageRating = averageRating.toFixed(1);
                 return {
                     book,
                     averageRating,
