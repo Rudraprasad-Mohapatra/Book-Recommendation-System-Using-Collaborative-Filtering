@@ -63,7 +63,7 @@ const dailyTop100 = async (req, res) => {
 
 const bookData = async (req, res) => {
     try {
-        const id = req.params['id'];
+        const id = req.params['bookid'];
         const bookDetails = await Book.findById(id)
         res.status(200).json(bookDetails);
     } catch (error) {
@@ -131,13 +131,64 @@ const bestSellers = async (req, res) => {
     }
 }
 
+// Endpoint for Upvote a Book
+const upvote =  async (req, res) => {
+    const bookId = req.params.bookid;
+    console.log(bookId);
+    try {
+        // Find the book by its ID
+        const book = await Book.findById(bookId);
+        console.log(book);
+        if (!book) {
+            return res.status(404).json({ error: 'Book not found' });
+        }
+
+        // Increment the upvotes
+        book.upvotes += 1;
+
+        // Save the updated book
+        await book.save();
+
+        res.json({ message: 'Upvoted successfully', upvotes: book.upvotes });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+// Endpoint for Downvote a Book
+const downvote =  async (req, res) => {
+    const bookId = req.params.bookid;
+
+    try {
+        // Find the book by its ID
+        const book = await Book.findById(bookId);
+
+        if (!book) {
+            return res.status(404).json({ error: 'Book not found' });
+        }
+
+        // Decrement the downvotes
+        book.downvotes += 1;
+
+        // Save the updated book
+        await book.save();
+
+        res.json({ message: 'Downvoted successfully', downvotes: book.downvotes });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+
 
 
 export {
     newReleases,
     dailyTop100,
     bookData,
-    bestSellers
+    bestSellers,
+    upvote,
+    downvote
 }
 
 

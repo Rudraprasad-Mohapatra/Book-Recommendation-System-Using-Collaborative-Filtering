@@ -9,7 +9,9 @@ const bookSchema = new mongoose.Schema({
     Publisher: String,
     'Image-URL-S': String,
     'Image-URL-M': String,
-    'Image-URL-L': String
+    'Image-URL-L': String,
+    upvotes: { type: Number, default: 0 },
+    downvotes: { type: Number, default: 0 },
 });
 
 // Create the Mongoose model using the schema
