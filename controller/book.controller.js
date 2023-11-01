@@ -1,5 +1,7 @@
 import Book from "../model/book.model.js"
 import Rating from "../model/rating.model.js"
+import UserDownvote from "../model/user.downvote.model.js";
+import UserUpvote from "../model/user.upvote.model.js";
 
 const newReleases = async (req, res) => {
     const PAGE_SIZE = 10;
@@ -132,55 +134,77 @@ const bestSellers = async (req, res) => {
 }
 
 // Endpoint for Upvote a Book
-const upvote =  async (req, res) => {
+const upvote = async (req, res) => {
     const bookId = req.params.bookid;
-    console.log(bookId);
+    // const userId = req.user.userId; // Get the user ID from the cookies through middleware
+    const userId = '653aadef537da3630b41141d';
+
     try {
-        // Find the book by its ID
-        const book = await Book.findById(bookId);
-        console.log(book);
-        if (!book) {
-            return res.status(404).json({ error: 'Book not found' });
+        // Check if the user has already upvoted this book
+        const existingUpvote = await UserUpvote.findOne({ userId, bookId });
+        console.log(existingUpvote);
+        if (existingUpvote) {
+            // User has previously upvoted; remove the upvote
+            await existingUpvote.remove();
+
+            // Decrement the upvotes in the book
+            const book = await Book.findById(bookId);
+            book.upvotes -= 1;
+            await book.save();
+
+            res.json({ message: 'Upvote removed', upvotes: book.upvotes });
+        } else {
+            // User has not upvoted before; upvote the book
+            const newUpvote = await UserUpvote.create({ userId, bookId });
+
+            // Increment the upvotes in the book
+            const book = await Book.findById(bookId);
+            book.upvotes += 1;
+            await book.save();
+
+            res.json({ message: 'Upvoted successfully', upvotes: book.upvotes });
         }
-
-        // Increment the upvotes
-        book.upvotes += 1;
-
-        // Save the updated book
-        await book.save();
-
-        res.json({ message: 'Upvoted successfully', upvotes: book.upvotes });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 }
+
 
 // Endpoint for Downvote a Book
-const downvote =  async (req, res) => {
+const downvote = async (req, res) => {
     const bookId = req.params.bookid;
+    // const userId = req.body.userId; // Assuming you have a user ID in the request body
+    const userId = "653aadef537da3630b41141d";
 
     try {
-        // Find the book by its ID
-        const book = await Book.findById(bookId);
+        // Check if the user has already downvoted this book
+        const existingDownvote = await UserDownvote.findOne({ userId, bookId });
 
-        if (!book) {
-            return res.status(404).json({ error: 'Book not found' });
+        if (existingDownvote) {
+            // User has previously downvoted; remove the downvote
+            await existingDownvote.remove();
+
+            // Decrement the downvotes in the book
+            const book = await Book.findById(bookId);
+            book.downvotes -= 1;
+            await book.save();
+
+            res.json({ message: 'Downvote removed', downvotes: book.downvotes });
+        } else {
+            // User has not downvoted before; downvote the book
+            const newDownvote = await UserDownvote.create({ userId, bookId });
+
+            // Increment the downvotes in the book
+            const book = await Book.findById(bookId);
+            book.downvotes += 1;
+            await book.save();
+
+            res.json({ message: 'Downvoted successfully', downvotes: book.downvotes });
         }
-
-        // Decrement the downvotes
-        book.downvotes += 1;
-
-        // Save the updated book
-        await book.save();
-
-        res.json({ message: 'Downvoted successfully', downvotes: book.downvotes });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 }
-
-
-
 
 export {
     newReleases,
