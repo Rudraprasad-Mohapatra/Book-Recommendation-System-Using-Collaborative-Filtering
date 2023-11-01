@@ -145,14 +145,14 @@ const upvote = async (req, res) => {
         console.log(existingUpvote);
         if (existingUpvote) {
             // User has previously upvoted; remove the upvote
-            await existingUpvote.remove();
+            await UserUpvote.deleteOne({ _id: existingUpvote._id }); // Remove the document by its _id
 
             // Decrement the upvotes in the book
             const book = await Book.findById(bookId);
             book.upvotes -= 1;
             await book.save();
 
-            res.json({ message: 'Upvote removed', upvotes: book.upvotes });
+            res.json({ message: 'Upvote removed', upvotes: book.upvotes, book: book });
         } else {
             // User has not upvoted before; upvote the book
             const newUpvote = await UserUpvote.create({ userId, bookId });
@@ -162,7 +162,7 @@ const upvote = async (req, res) => {
             book.upvotes += 1;
             await book.save();
 
-            res.json({ message: 'Upvoted successfully', upvotes: book.upvotes });
+            res.json({ message: 'Upvoted successfully', upvotes: book.upvotes, book: book });
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -179,17 +179,17 @@ const downvote = async (req, res) => {
     try {
         // Check if the user has already downvoted this book
         const existingDownvote = await UserDownvote.findOne({ userId, bookId });
-
+        console.log(existingDownvote);
         if (existingDownvote) {
             // User has previously downvoted; remove the downvote
-            await existingDownvote.remove();
+            await UserDownvote.deleteOne({ _id: existingDownvote._id }); // Remove the document by its _id
 
             // Decrement the downvotes in the book
             const book = await Book.findById(bookId);
             book.downvotes -= 1;
             await book.save();
 
-            res.json({ message: 'Downvote removed', downvotes: book.downvotes });
+            res.json({ message: 'Downvote removed', downvotes: book.downvotes, book: book });
         } else {
             // User has not downvoted before; downvote the book
             const newDownvote = await UserDownvote.create({ userId, bookId });
@@ -199,7 +199,7 @@ const downvote = async (req, res) => {
             book.downvotes += 1;
             await book.save();
 
-            res.json({ message: 'Downvoted successfully', downvotes: book.downvotes });
+            res.json({ message: 'Downvoted successfully', downvotes: book.downvotes, book: book });
         }
     } catch (error) {
         res.status(500).json({ error: error.message });
