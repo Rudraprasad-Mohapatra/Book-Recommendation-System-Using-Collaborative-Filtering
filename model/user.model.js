@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { config } from "dotenv";
 import JWT from "jsonwebtoken";
 import crypto from "crypto";
 
+config();
 const userSchema = new mongoose.Schema({
     userId: {
         type: Number,
@@ -55,6 +57,45 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
+userSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+    this.password = await bcrypt.hash(this.password, 10);
+})
+
+userSchema.methods = {
+    generateJWTtoken: async function () {
+
+        const payload = {
+            id: this._id,
+            email: this.email,
+            subscription: this.subscription,
+            role: this.role
+        }
+
+        const secretKey = process.env.JWT_SECRET;
+
+        const options = { expiresIn: process.env.JWT_EXPIRY }
+
+        return await JWT.sign(payload, secretKey, options);
+
+    },
+    comparePassword: async function (plainTextPassword) {
+        return await bcrypt.compare(plainTextPassword, tis.password);
+    },
+    generatePasswordResetToken: async function () {
+        const resetToken = crypto.randomBytes(20).toString("hex");
+        this.forgotPasswordToken = crypto
+            .createHash('sha256')
+            .update(resetToken)
+            .disgest('hex');
+
+        this.forgotPasswordExpiry = Date.now() + a5 * 60 * 60 * 1000;
+
+        return resetToken;
+    }
+}
 
 
 const User = mongoose.model('User', userSchema);
