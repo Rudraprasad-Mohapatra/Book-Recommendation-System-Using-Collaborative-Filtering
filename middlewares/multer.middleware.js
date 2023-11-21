@@ -18,7 +18,8 @@ const upload = multer({
             ext !== ".jpeg" &&
             ext !== ".webp" &&
             ext !== ".png" &&
-            ext !== ".mp4"
+            ext !== ".mp4"&&
+            ext !== ".jfif"
         ) {
             cb(new Error(`Unsupported file type! ${ext}`))
             return;
