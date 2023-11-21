@@ -8,17 +8,18 @@ config();
 const userSchema = new mongoose.Schema({
     userId: {
         type: Number,
-        required: true
+        required: [true, "userId is required"],
     },
-    Location: {
+    location: {
         type: String,
-        required: true
+        required: [true, "location is required"],
     },
-    Password: {
+    password: {
         type: String,
         required: [true, "password is required"],
         select: false
-    }, fullName: {
+    },
+    fullname: {
         type: String,
         required: [true, 'Name is required'],
         minLength: [5, 'Name must be atleast 5 character'],

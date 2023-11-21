@@ -13,7 +13,7 @@ const cookieOptions = {
 
 const register = async (req, res, next) => {
     try {
-        const { fullname, email, password, role } = req.body;
+        const { userId, fullname, email, password, role, location } = req.body;
 
         if (!fullname || !email || !password) {
             return next(new AppError("All fields are required", 400));
@@ -25,10 +25,12 @@ const register = async (req, res, next) => {
             return next(new AppError("Email already exists", 400));
         }
 
-        const user = await user.create({
+        const user = await User.create({
+            userId,
             fullname,
             email,
             password,
+            location,
             avatar: {
                 public_id: email,
                 secure_url: "https://res.cloudinary.com/demo/image/gravatar/w_120,h_80,c_fill/e3264cf16f34ecd3c7c564f5668cbc1e.jpg"
@@ -65,9 +67,15 @@ const register = async (req, res, next) => {
         }
 
         await user.save();
+
         user.password = undefined;
         const token = await user.generateJWTtoken();
-        res.cookie('token', token, cookieOptions)
+        res.cookie('token', token, cookieOptions);
+        res.status(201).json({
+            success: true,
+            message: "User registered successfully",
+            user
+        });
     }
     catch (error) {
         console.error(error);
